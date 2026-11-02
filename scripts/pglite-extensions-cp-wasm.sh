@@ -18,5 +18,10 @@ for dir in "$root_dir"/pglite-*; do
   # Skip if it doesn't actually start with pglite-
   [[ "$suffix" != "$folder_name" ]] || continue
 
-  mkdir -p "$root_dir"/"$folder_name"/release && cp "$postgrespglite_dir"/dist/extensions/other/"$suffix"*.tar.gz "$root_dir"/"$folder_name"/release/"$suffix".tar.gz
+  # the bundle named like the package, else one whose name starts like it
+  # (with only a prefix, timescaledb would also match timescaledb_toolkit)
+  bundle="$postgrespglite_dir"/dist/extensions/other/"$suffix".tar.gz
+  [[ -f "$bundle" ]] || bundle=$(ls "$postgrespglite_dir"/dist/extensions/other/"$suffix"*.tar.gz)
+
+  mkdir -p "$root_dir"/"$folder_name"/release && cp "$bundle" "$root_dir"/"$folder_name"/release/"$suffix".tar.gz
 done

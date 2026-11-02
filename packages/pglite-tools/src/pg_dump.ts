@@ -157,10 +157,20 @@ export async function pgDump({
   args,
   fileName = 'dump.sql',
 }: PgDumpOptions) {
-  const getSearchPath = await pg.query<{ search_path: string }>(
-    'SHOW SEARCH_PATH;',
+  // pg_dump runs in PGlite's single session, the one the application uses, and
+  // sets session parameters for itself (search_path, restrict_nonsystem_relation_kind,
+  // row_security, timeouts, ...). They are restored afterwards. The transaction_*
+  // parameters describe the current transaction, not the session.
+  const sessionSettings = async () =>
+    (
+      await pg.query<{ name: string; setting: string }>(
+        `SELECT name, setting FROM pg_settings
+         WHERE context IN ('user', 'superuser') AND name NOT LIKE 'transaction\\_%'`,
+      )
+    ).rows
+  const settingsBefore = new Map(
+    (await sessionSettings()).map(({ name, setting }) => [name, setting]),
   )
-  const searchPath = getSearchPath.rows[0].search_path
 
   const baseArgs = [
     '-U',
@@ -178,16 +188,11 @@ export async function pgDump({
   })
 
   await pg.exec(`DEALLOCATE ALL`)
-  await pg.exec(`SET SEARCH_PATH = ${searchPath}`)
-  const newSearchPath = await pg.query<{ search_path: string }>(
-    'SHOW SEARCH_PATH;',
-  )
-  if (newSearchPath.rows[0].search_path !== searchPath) {
-    console.warn(
-      `Warning: search_path has been changed from ${searchPath} to ${newSearchPath}`,
-      searchPath,
-      newSearchPath,
-    )
+  for (const { name, setting } of await sessionSettings()) {
+    const before = settingsBefore.get(name)
+    if (before !== undefined && before !== setting) {
+      await pg.query('SELECT set_config($1, $2, false)', [name, before])
+    }
   }
 
   if (execResult.exitCode !== 0) {

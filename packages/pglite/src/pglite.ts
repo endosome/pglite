@@ -509,6 +509,7 @@ export class PGlite
     // - init: A function to initialize the extension/plugin after the database is ready
     // - close: A function to close/tidy-up the extension/plugin when the database is closed
     const extSharedPreloadLibraries: string[] = []
+    const extPostgresqlConf: string[] = []
     for (const [extName, ext] of Object.entries(this.#extensions)) {
       if (ext instanceof URL) {
         // Extension with only a URL to a bundle
@@ -535,6 +536,7 @@ export class PGlite
           this.#extensionsClose.push(extRet.close)
         }
         extSharedPreloadLibraries.push(...(extRet.sharedPreloadLibraries ?? []))
+        extPostgresqlConf.push(...(extRet.postgresqlConf ?? []))
       }
     }
     emscriptenOpts['pg_extensions'] = extensionBundlePromises
@@ -629,7 +631,11 @@ export class PGlite
       // Start compiling dynamic extensions present in FS.
       await loadExtensions(this.mod, (...args) => this.#log(...args))
 
-      this.#handlePostgresqlConf(extSharedPreloadLibraries, options)
+      this.#handlePostgresqlConf(
+        extSharedPreloadLibraries,
+        extPostgresqlConf,
+        options,
+      )
 
       this.mod!._pgl_setPGliteActive(1)
       this.#startInSingleMode({
@@ -659,17 +665,24 @@ export class PGlite
 
   #handlePostgresqlConf(
     extSharedPreloadLibraries: string[],
+    extPostgresqlConf: string[],
     options: PGliteOptions<Extensions>,
   ) {
-    if (extSharedPreloadLibraries.length && !options.postgresqlconf) {
+    if (
+      (extSharedPreloadLibraries.length || extPostgresqlConf.length) &&
+      !options.postgresqlconf
+    ) {
       options.postgresqlconf = new Array<string>()
     }
 
     if (options.postgresqlconf) {
-      let conf =
+      // the extensions' lines first, so the user's settings override them
+      let conf = [
+        ...extPostgresqlConf,
         typeof options.postgresqlconf === 'string'
           ? options.postgresqlconf
-          : options.postgresqlconf.join('\n')
+          : options.postgresqlconf.join('\n'),
+      ].join('\n')
 
       if (extSharedPreloadLibraries.length) {
         const splMatch = conf.match(/^(shared_preload_libraries\s*=\s*)(.*)$/m)

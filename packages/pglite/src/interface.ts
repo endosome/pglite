@@ -46,6 +46,8 @@ export interface ExtensionSetupResult<TNamespace = any> {
   namespaceObj?: TNamespace
   bundlePath?: URL
   sharedPreloadLibraries?: string[]
+  /** Lines for postgresql.conf, before the ones from the `postgresqlconf` option */
+  postgresqlConf?: string[]
   init?: () => Promise<void>
   close?: () => Promise<void>
 }

@@ -866,6 +866,42 @@ await testEsmCjsAndDTC(async (importType) => {
       ])
     })
 
+    it('postgresqlConf from extensions, overridden by postgresqlconf', async () => {
+      const ext = {
+        name: 'conf',
+        setup: async (_pg: any, emscriptenOpts: any) => ({
+          emscriptenOpts,
+          postgresqlConf: [
+            `application_name = 'from extension'`,
+            `work_mem = '8MB'`,
+          ],
+        }),
+      }
+      const pg = await PGlite.create({ extensions: { ext } })
+      const settings = async (db: PGlite) =>
+        (
+          await db.query<{ application_name: string; work_mem: string }>(
+            `SELECT current_setting('application_name') AS application_name,
+                    current_setting('work_mem') AS work_mem`,
+          )
+        ).rows[0]
+      expect(await settings(pg)).toEqual({
+        application_name: 'from extension',
+        work_mem: '8MB',
+      })
+      await pg.close()
+
+      const overridden = await PGlite.create({
+        extensions: { ext },
+        postgresqlconf: [`application_name = 'my awesome app'`],
+      })
+      expect(await settings(overridden)).toEqual({
+        application_name: 'my awesome app',
+        work_mem: '8MB',
+      })
+      await overridden.close()
+    })
+
     it('PGlite version', async () => {
       const version = await db.query<{ version: string }>(`select version();`)
       const re = /\PGlite \d+\.\d+\.\d+\b/

@@ -136,6 +136,27 @@ describe('pgDump', () => {
     expect(initialSearchPath).toEqual(finalSearchPath)
   })
 
+  it('pg_dump should not change the session settings', async () => {
+    await pg.exec(`
+      CREATE TABLE test (id SERIAL PRIMARY KEY, name TEXT);
+      INSERT INTO test (name) VALUES ('row1');
+      CREATE VIEW test_view AS SELECT name FROM test;
+      SET statement_timeout = '10min';
+    `)
+    const settings = () =>
+      pg.query(
+        `SELECT name, setting FROM pg_settings WHERE context IN ('user', 'superuser') AND name NOT LIKE 'transaction\\_%' ORDER BY name`,
+      )
+    const before = await settings()
+
+    await pgDump({ pg })
+
+    expect(await settings()).toEqual(before)
+    // pg_dump sets restrict_nonsystem_relation_kind = view for itself
+    const rows = await pg.query<{ name: string }>('SELECT name FROM test_view')
+    expect(rows.rows).toEqual([{ name: 'row1' }])
+  })
+
   it('specify datadir: should dump a database with tables and data', async () => {
     const dataDir = '/tmp/pg_dump_pglite_data_dir'
     await fs.rm(dataDir, { force: true, recursive: true })

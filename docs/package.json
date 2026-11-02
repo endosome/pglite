@@ -34,6 +34,8 @@
     "@electric-sql/pglite-hypopg": "workspace:*",
     "@electric-sql/pglite-pg_repack": "workspace:*",
     "@electric-sql/pglite-plpgsql-check": "workspace:*",
+    "@electric-sql/pglite-timescaledb": "workspace:*",
+    "@electric-sql/pglite-timescaledb-toolkit": "workspace:*",
     "@uiw/codemirror-theme-github": "^4.23.0",
     "dedent": "^1.5.3"
   }

@@ -92,6 +92,12 @@ importers:
       '@electric-sql/pglite-repl':
         specifier: workspace:*
         version: link:../packages/pglite-repl
+      '@electric-sql/pglite-timescaledb':
+        specifier: workspace:*
+        version: link:../packages/pglite-extensions/pglite-timescaledb
+      '@electric-sql/pglite-timescaledb-toolkit':
+        specifier: workspace:*
+        version: link:../packages/pglite-extensions/pglite-timescaledb_toolkit
       '@uiw/codemirror-theme-github':
         specifier: ^4.23.0
         version: 4.23.5(@codemirror/language@6.11.3)(@codemirror/state@6.5.2)(@codemirror/view@6.38.2)
@@ -486,6 +492,51 @@ importers:
       '@electric-sql/pglite':
         specifier: workspace:*
         version: link:../../pglite
+      '@electric-sql/pglite-utils':
+        specifier: workspace:*
+        version: link:../../pglite-utils
+      '@types/node':
+        specifier: ^20.16.11
+        version: 20.16.11
+      vitest:
+        specifier: ^2.1.2
+        version: 2.1.2(@types/node@20.16.11)(jsdom@24.1.3)(terser@5.34.1)
+
+  packages/pglite-extensions/pglite-timescaledb:
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: ^0.18.1
+        version: 0.18.1
+      '@electric-sql/pglite':
+        specifier: workspace:*
+        version: link:../../pglite
+      '@electric-sql/pglite-tools':
+        specifier: workspace:*
+        version: link:../../pglite-tools
+      '@electric-sql/pglite-utils':
+        specifier: workspace:*
+        version: link:../../pglite-utils
+      '@types/node':
+        specifier: ^20.16.11
+        version: 20.16.11
+      vitest:
+        specifier: ^2.1.2
+        version: 2.1.2(@types/node@20.16.11)(jsdom@24.1.3)(terser@5.34.1)
+
+  packages/pglite-extensions/pglite-timescaledb_toolkit:
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: ^0.18.1
+        version: 0.18.1
+      '@electric-sql/pglite':
+        specifier: workspace:*
+        version: link:../../pglite
+      '@electric-sql/pglite-timescaledb':
+        specifier: workspace:*
+        version: link:../pglite-timescaledb
+      '@electric-sql/pglite-tools':
+        specifier: workspace:*
+        version: link:../../pglite-tools
       '@electric-sql/pglite-utils':
         specifier: workspace:*
         version: link:../../pglite-utils
@@ -2480,7 +2531,6 @@ packages:
 
   bun@1.1.30:
     resolution: {integrity: sha512-ysRL1pq10Xba0jqVLPrKU3YIv0ohfp3cTajCPtpjCyppbn3lfiAVNpGoHfyaxS17OlPmWmR67UZRPw/EueQuug==}
-    cpu: [arm64, x64]
     os: [darwin, linux, win32]
     hasBin: true
 

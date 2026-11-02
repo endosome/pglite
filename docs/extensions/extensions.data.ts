@@ -770,6 +770,41 @@ const baseExtensions: Extension[] = [
     npmjsUrl:
       'https://www.npmjs.com/package/@electric-sql/pglite-plpgsql-check',
   },
+  {
+    name: 'timescaledb',
+    description: `
+    TimescaleDB is a time-series database for PostgreSQL. This wasm port provides limited support for TimescaleDB:
+    background workers are disabled, so scheduled jobs (compression, retention and continuous aggregate refresh
+    policies) do not run.
+
+    This is an **external** extension, distributed as a separate package at https://www.npmjs.com/package/@electric-sql/pglite-timescaledb
+    `,
+    shortDescription: 'Time-series database for PostgreSQL.',
+    docs: 'https://github.com/timescale/timescaledb',
+    tags: ['postgres extension', 'external'],
+    importPath: '@electric-sql/pglite-timescaledb',
+    importName: 'timescaledb',
+    size: 4539419,
+    npmjsUrl: 'https://www.npmjs.com/package/@electric-sql/pglite-timescaledb',
+  },
+  {
+    name: 'timescaledb_toolkit',
+    description: `
+    TimescaleDB Toolkit adds hyperfunctions for time-series analysis to PostgreSQL, such as heartbeat
+    aggregates (heartbeat_agg, rollup, live_ranges), statistical and percentile approximations, and
+    time-weighted averages. Its continuous aggregate examples need TimescaleDB as well.
+
+    This is an **external** extension, distributed as a separate package at https://www.npmjs.com/package/@electric-sql/pglite-timescaledb-toolkit
+    `,
+    shortDescription: 'Hyperfunctions for time-series analysis.',
+    docs: 'https://github.com/timescale/timescaledb-toolkit',
+    tags: ['postgres extension', 'external'],
+    importPath: '@electric-sql/pglite-timescaledb-toolkit',
+    importName: 'timescaledb_toolkit',
+    size: 3542605,
+    npmjsUrl:
+      'https://www.npmjs.com/package/@electric-sql/pglite-timescaledb-toolkit',
+  },
 ]
 
 const tags = [
